@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Task Management App</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            padding: 10px;
+        }
+        .task-item .task-name {
+            flex-grow: 1;
+        }
+        .task-item .task-actions {
+            display: flex;
+        }
+        .task-actions button {
+            margin: 0 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Management App</h1>
+    <form id="task-form">
+        <input type="text" id="new-task" placeholder="Add a new task" required>
+        <button type="submit">Add Task</button>
+    </form>
+    <ul id="task-list" class="task-list"></ul>
+
+    <script>
+        // JavaScript code for task management
+        document.addEventListener("DOMContentLoaded", function () {
+            const taskForm = document.getElementById("task-form");
+            const taskInput = document.getElementById("new-task");
+            const taskList = document.getElementById("task-list");
+
+            // Load tasks from local storage
+            function loadTasks() {
+                const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+                for (const task of tasks) {
+                    addTaskToList(task);
+                }
+            }
+
+            // Save tasks to local storage
+            function saveTasks(tasks) {
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+            }
+
+            // Add a new task to the list
+            function addTaskToList(task) {
+                const taskItem = document.createElement("li");
+                taskItem.className = "task-item";
+                taskItem.innerHTML = `
+                    <span class="task-name">${task.name}</span>
+                    <div class="task-actions">
+                        <button class="edit" data-id="${task.id}">Edit</button>
+                        <button class="delete" data-id="${task.id}">Delete</button>
+                        <button class="complete" data-id="${task.id}">Complete</button>
+                    </div>
+                `;
+                taskList.appendChild(taskItem);
+            }
+
+            // Event listener for adding a new task
+            taskForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const taskName = taskInput.value;
+                if (taskName) {
+                    const taskId = Date.now().toString();
+                    const newTask = { id: taskId, name: taskName, completed: false };
+                    addTaskToList(newTask);
+                    taskInput.value = "";
+                    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+                    tasks.push(newTask);
+                    saveTasks(tasks);
+                }
+            });
+
+            // Event delegation for editing, deleting, and completing tasks
+            taskList.addEventListener("click", function (e) {
+                if (e.target.classList.contains("edit")) {
+                    // Handle editing a task
+                    // You can use a modal or in-place editing here
+                    // Update the task in local storage
+                    const taskId = e.target.getAttribute("data-id");
+                    // Implement editing logic here
+                } else if (e.target.classList.contains("delete")) {
+                    // Handle deleting a task
+                    const taskId = e.target.getAttribute("data-id");
+                    // Remove the task from the list
+                    e.target.closest(".task-item").remove();
+                    // Update the task list in local storage
+                    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+                    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+                    saveTasks(updatedTasks);
+                } else if (e.target.classList.contains("complete")) {
+                    // Handle completing/uncompleting a task
+                    const taskId = e.target.getAttribute("data-id");
+                    // Implement complete/uncomplete logic here
+                }
+            });
+
+            // Load tasks when the page loads
+            loadTasks();
+        });
+    </script>
+</body>
+</html>
